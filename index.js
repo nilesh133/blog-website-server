@@ -7,10 +7,11 @@ const router = require("./routes/userRoutes");
 const postRoutes = require("./routes/postRoutes");
 const profileRoutes = require("./routes/profileRoutes");
 const bodyParser = require("body-parser");
-const path = require("path")
+var cors = require('cors')
 
 connect();
 app.use(bodyParser.json());
+app.use(cors())
 
 app.get("/", (req, res) => {
     res.send("Home page")
