@@ -9,9 +9,7 @@ const profileRoutes = require("./routes/profileRoutes");
 const bodyParser = require("body-parser");
 var cors = require('cors')
 
-app.use(cors({
-    origin: "https://blog-website-nilesh133.vercel.app/"
-}))
+app.use(cors())
 
 connect();
 app.use(bodyParser.json());
