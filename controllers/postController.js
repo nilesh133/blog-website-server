@@ -5,73 +5,52 @@ const Post = require("../models/postSchema");
 const { body, validationResult } = require("express-validator");
 const { htmlToText } = require("html-to-text");
 const User = require("../models/userSchema");
-module.exports.createPost = (req, res) => {
-    const form = formidable({ multiples: true });
-    form.parse(req, async (error, fields, files) => {
-        const { title, category, description, id, slug, name } = fields;
-        const errors = [];
-        if (title === '') {
-            errors.push({ msg: 'Please fill the title' });
-        }
-        if (category === '') {
-            errors.push({ msg: 'Please select the category' });
-        }
-        if (description === '') {
-            errors.push({ msg: 'Description is required' });
-        }
-        // if (body === '') {
-        //     errors.push({ msg: 'Please fill the body' });
-        // }
-        if (slug === '') {
-            errors.push({ msg: 'Please fill the slug' });
-        }
-        if (Object.keys(files).length === 0) {
-            errors.push({ msg: 'Image is required' });
-        }
-        else {
-            const { type } = files.image;
-            console.log(type);
-            const split = type.split('/');
-            const extension = split[1].toLowerCase();
-            if (extension !== 'jpg' && extension != 'png' && extension != 'jpeg') {
-                errors.push({ msg: `.${extension} is not acceptable for image` })
-            }
-            else {
-                files.image.name = uuidv4() + '.' + extension;
-            }
-        }
-        const checkSlug = await Post.findOne({ slug });
-        if (checkSlug) {
-            errors.push({ msg: "Please write a unique slug" });
-        }
-        if (errors.length !== 0) {
-            return res.status(400).json({ errors });
-        }
-        else {
-            const newPath = __dirname + `/../build/public/images/${files.image.name}`;
-            fs.copyFile(files.image.path, newPath, async (error) => {
-                if (!error) {
-                    try {
-                        const response = await Post.create({
-                            title,
-                            category,
-                            /*body,*/
-                            image: files.image.name,
-                            description,
-                            slug,
-                            userName: name,
-                            userId: id
-                        })
-                        return res.status(200).json({ msg: "Post created successfully" });
-                    } catch (error) {
-                        console.log(error.message);
-                        return res.status(500).json({ errors: error, msg: error.message });
-                        
-                    }
-                }
+
+module.exports.createPost = async (req, res) => {
+
+    const { title, slug, category, imageUrl, description, id } = req.body;
+    console.log(req.body)
+    const errors = [];
+    if (title === '') {
+        errors.push({ msg: 'Please fill the title' });
+    }
+    if (slug === '') {
+        errors.push({ msg: 'Please fill the slug' });
+    }
+    if (category === '') {
+        errors.push({ msg: 'Please select the category' });
+    }
+    if (imageUrl === '') {
+        errors.push({ msg: 'Image is required' });
+    }
+    if (description === '') {
+        errors.push({ msg: 'Description is required' });
+    }
+
+    const checkSlug = await Post.findOne({ slug });
+    if (checkSlug) {
+        errors.push({ msg: "Please write a unique slug" });
+    }
+    if (errors.length !== 0) {
+        return res.status(400).json({ errors });
+    }
+    else {
+        try {
+            const response = await Post.create({
+                title,
+                slug,
+                category,
+                imageUrl,
+                description,
+                userId: id
             })
+            return res.status(200).json({ msg: "Post created successfully" });
+        } catch (error) {
+            console.log(error.message);
+            return res.status(500).json({ errors: error, msg: error.message });
+
         }
-    })
+    }
 }
 
 module.exports.fetchPosts = async (req, res) => {
@@ -136,47 +115,25 @@ module.exports.updatePost = async (req, res) => {
 }
 
 module.exports.updateImage = async (req, res) => {
-    const form = formidable({ multiples: true });
-    form.parse(req, (errors, fields, files) => {
-        const { id } = fields;
-        const imageError = [];
-        if (Object.keys(files).length === 0) {
-            imageError.push({ msg: "Please choose image" });
-            // console.log("Errorr...");
-        }
-        else {
-            const { type } = files.image;
-            const split = type.split('/');
-            // console.log(split);
-            // console.log(type);
-            const extension = split[1].toLowerCase();
-            if (extension !== 'jpg' && extension !== 'jpeg' && extension !== "png") {
-                imageError.push({ msg: `${extension} is not allowed for image` });
-            }
-            else {
-                files.image.name = uuidv4() + "." + extension;
-            }
-        }
-        if (imageError.length !== 0) {
-            console.log(errors);
-            return res.status(400).json({ errors: imageError })
-        }
-        else {
-            const newPath = __dirname + `/../build/public/images/${files.image.name}`;
-            fs.copyFile(files.image.path, newPath, async (error) => {
-                if (!error) {
-                    try {
-                        const response = await Post.findByIdAndUpdate(id, {
-                            image: files.image.name
-                        })
-                        return res.status(200).json({ msg: "Image updated successfully" });
-                    } catch (error) {
-                        return res.status(500).json({ errors: error, msg: error.message });
-                    }
-                }
+    const { imageUrl, id } = req.body;
+    const imageError = [];
+    if (imageUrl === '') {
+        imageError.push({ msg: "Please choose image" });
+    }
+    if (imageError.length !== 0) {
+        console.log(errors);
+        return res.status(400).json({ errors: imageError })
+    }
+    else {
+        try {
+            const response = await Post.findByIdAndUpdate(id, {
+                imageUrl
             })
+            return res.status(200).json({ msg: "Image updated successfully" });
+        } catch (error) {
+            return res.status(500).json({ errors: error, msg: error.message });
         }
-    })
+    }
 }
 
 module.exports.deletePost = async (req, res) => {
@@ -207,7 +164,7 @@ module.exports.deletePost = async (req, res) => {
 module.exports.homeTesting = async (req, res) => {
     try {
         const posts = await Post.find({});
-        
+
         return res.status(200).json(posts)
     } catch (error) {
         console.log(error.message);
@@ -217,12 +174,12 @@ module.exports.homeTesting = async (req, res) => {
 
 module.exports.postDetail = async (req, res) => {
     const id = req.params.id;
-    try{
-        const post = await Post.findOne({_id: id});
+    try {
+        const post = await Post.findOne({ _id: id });
         console.log(post);
-        return res.status(200).json({post});
+        return res.status(200).json({ post });
     }
-    catch(error){
+    catch (error) {
         return res.status(500).json({ errors: error, msg: error.message });
     }
 }

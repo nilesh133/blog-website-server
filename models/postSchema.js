@@ -6,27 +6,22 @@ const postSchema = new Schema({
         required: true
     },
 
-    category: {
-        type: String,
-        required: true
-    },
-
-    image: {
-        type: String,
-        required: true
-    },
-
-    description: {
-        type: String,
-        required: true
-    },
-
     slug: {
         type: String,
         required: true
     },
 
-    userName: {
+    category: {
+        type: String,
+        required: true
+    },
+
+    imageUrl: {
+        type: String,
+        required: true
+    },
+
+    description: {
         type: String,
         required: true
     },
