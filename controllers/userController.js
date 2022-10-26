@@ -28,11 +28,9 @@ module.exports.registerValidation = [
     body("confirmpassword").isLength({min: 8}).withMessage("Confirm Password must be 8 characters long")
 ]
 
-//  Registration
 module.exports.register = async (req, res) =>{
     const {name, email, username, phone, profession, age, password, confirmpassword} = req.body;
     const errors = validationResult(req);
-    console.log(errors.array());
 
     if(password != confirmpassword){
         return res.status(401).json({errors: [{msg: "Password and Confirm Password must be equal"}]});
@@ -48,20 +46,11 @@ module.exports.register = async (req, res) =>{
             return res.status(400).json({errors: [{msg: 'Email already exists'}]});
         }
 
-        // Password Hashing
         const salt = await bcrypt.genSalt(10);
-        // console.log(salt);
         const hash = await bcrypt.hash(password, salt);
-        // console.log(hash);
 
         try{
             const user = await User.create({
-                // One method
-                // name: name,
-                // email: email,
-                // password: hash
-
-                // Second method
                 name,
                 email,
                 username,
@@ -72,7 +61,6 @@ module.exports.register = async (req, res) =>{
                 confirmpassword: hash,
             });
 
-            // JWT token
             const token = generateToken(user);
 
             return res.status(200).json({msg: 'Your account has been created', token})
@@ -85,7 +73,6 @@ module.exports.register = async (req, res) =>{
     }
 };
 
-// Login
 module.exports.loginValidation = [
     body("email").not().isEmpty().trim().withMessage("Please fill the Email"),
     body("password").not().isEmpty().withMessage("Please fill the Password")

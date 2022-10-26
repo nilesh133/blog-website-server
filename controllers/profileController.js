@@ -70,10 +70,8 @@ module.exports.updateAboutValidation = [
     })
 ]
 module.exports.updateAbout = async (req, res) => {
-    console.log(req.body);
     const { id, name, email, username, profession, phone, age } = req.body;
     const errors = validationResult(req);
-    console.log(errors.array());
 
     if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() })
@@ -81,27 +79,6 @@ module.exports.updateAbout = async (req, res) => {
 
     else {
         try {
-            // const user = await User.find({ _id: id });
-            // user.name = newName
-            // user.email = newEmail
-            // user.username = newUsername
-            // user.phone = newPhone
-            // user.profession = newProfession
-            // user.age = newAge
-            // user.new = true
-            // user.save(function(err){
-
-            // })
-
-            //      { name: newName },
-            //     //  { email: newEmail }, 
-            //     //  { username: newUsername },
-            //     //  { phone: newPhone },
-            //     //  { profession: newProfession },
-            //     //  { age: newAge },
-            //      { new: true }, 
-            //      );
-           
                 const updatedUserInfo = await User.findByIdAndUpdate(id, {
                     name,
                     email,
@@ -111,42 +88,15 @@ module.exports.updateAbout = async (req, res) => {
                     age,
                     new: true
                 });
-                // const token = jwt.sign({ updatedUserInfo }, process.env.SECRET, {
-                //     expiresIn: '7d',
-                // });
                 return res.status(200).json({ msg: "Details Updated Successfully" })
             } catch (error) {
-                console.log(error);
                 return res.status(500).json({ errors: error, msg: error.message });
             }
-
-        //     const user = await User.findOneAndUpdate({ "_id": id }, { "$set": { "name": newName, "username": newUsername, "phone": newPhone, "profession": newProfession, "age": newAge } }, { new: true }).exec(function (err, book) {
-        //         if (err) {
-        //             console.log(err);
-        //             res.status(500).send(err);
-        //         } else {
-        //             res.status(200).send(book);
-        //         }
-        //     });
-        //     const token = jwt.sign({ user }, process.env.SECRET, {
-        //         expiresIn: '7d',
-        //     });
-        //     return res.status(200).json({ token, msg: "Details Updated successfully" });
-        // } catch (error) {
-        //     console.log(error);
-        //     return res.status(500).json({ errors });
-        // }
     }
 }
 
 module.exports.updateEmail = async (req, res) => {
     const { email, id } = req.body;
-    // const errors = updateAboutValidation(req);
-    // console.log(errors.array());
-
-    // if (!errors.isEmpty()) {
-    //     return res.status(400).json({ errors: errors.array() })
-    // }
     if (email === '') {
         return res.status(400).json({ errors: [{ msg: "Please fill the new email" }] })
     }
@@ -165,12 +115,6 @@ module.exports.updateEmail = async (req, res) => {
 
 module.exports.updateUsername = async (req, res) => {
     const { username, id } = req.body;
-    // const errors = updateAboutValidation(req);
-    // console.log(errors.array());
-
-    // if (!errors.isEmpty()) {
-    //     return res.status(400).json({ errors: errors.array() })
-    // }
     if (username === '') {
         return res.status(400).json({ errors: [{ msg: "Please fill the new username" }] })
     }
@@ -189,12 +133,6 @@ module.exports.updateUsername = async (req, res) => {
 
 module.exports.updateProfession = async (req, res) => {
     const { profession, id } = req.body;
-    // const errors = updateAboutValidation(req);
-    // console.log(errors.array());
-
-    // if (!errors.isEmpty()) {
-    //     return res.status(400).json({ errors: errors.array() })
-    // }
     if (profession === '') {
         return res.status(400).json({ errors: [{ msg: "Please fill the new profession" }] })
     }
@@ -211,18 +149,8 @@ module.exports.updateProfession = async (req, res) => {
     }
 }
 
-// module.exports.updatePhoneValidation = [
-//     body("phone").isLength({ min: 10 }).withMessage("Length of number must be 10"),
-// ]
-
 module.exports.updatePhone = async (req, res) => {
     const { phone, id } = req.body;
-    // const errors = updatePhoneValidation(req);
-    // console.log(errors.array());
-
-    // if (!errors.isEmpty()) {
-    //     return res.status(400).json({ errors: errors.array() })
-    // }
     if (phone === '') {
         return res.status(400).json({ errors: [{ msg: "Please fill the new contact number" }] })
     }
@@ -241,12 +169,6 @@ module.exports.updatePhone = async (req, res) => {
 
 module.exports.updateAge = async (req, res) => {
     const { age, id } = req.body;
-    // const errors = updatePhoneValidation(req);
-    // console.log(errors.array());
-
-    // if (!errors.isEmpty()) {
-    //     return res.status(400).json({ errors: errors.array() })
-    // }
     if (age === '') {
         return res.status(400).json({ errors: [{ msg: "Please fill the new age" }] })
     }

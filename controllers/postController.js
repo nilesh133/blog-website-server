@@ -9,7 +9,6 @@ const User = require("../models/userSchema");
 module.exports.createPost = async (req, res) => {
 
     const { title, slug, category, imageUrl, description, id } = req.body;
-    console.log(req.body)
     const errors = [];
     if (title === '') {
         errors.push({ msg: 'Please fill the title' });
@@ -46,7 +45,6 @@ module.exports.createPost = async (req, res) => {
             })
             return res.status(200).json({ msg: "Post created successfully" });
         } catch (error) {
-            console.log(error.message);
             return res.status(500).json({ errors: error, msg: error.message });
 
         }
@@ -81,19 +79,10 @@ module.exports.fetchPost = async (req, res) => {
 
 module.exports.updateValidations = [
     body('title').notEmpty().trim().withMessage("Title is required"),
-    // body('body').notEmpty().trim().custom(value => {
-    //     let bodyValue = value.replace(/\n/g, '');
-    //     if (htmlToText(bodyValue).trim().length === 0) {
-    //         return false;
-    //     }
-    //     else {
-    //         return true;
-    //     }
-    // }).withMessage("Body is required"),
     body('description').notEmpty().trim().withMessage("Description is required"),
 ]
 module.exports.updatePost = async (req, res) => {
-    const { title, /*body,*/ category, description, id } = req.body;
+    const { title, category, description, id } = req.body;
 
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -103,7 +92,6 @@ module.exports.updatePost = async (req, res) => {
         try {
             const response = await Post.findByIdAndUpdate(id, {
                 title,
-                /*body,*/
                 category,
                 description
             });
@@ -121,7 +109,6 @@ module.exports.updateImage = async (req, res) => {
         imageError.push({ msg: "Please choose image" });
     }
     if (imageError.length !== 0) {
-        console.log(errors);
         return res.status(400).json({ errors: imageError })
     }
     else {
@@ -147,27 +134,12 @@ module.exports.deletePost = async (req, res) => {
     }
 }
 
-// module.exports.home = async (req, res) => {
-//     const page = req.params.page;
-//     const perPage = 3;
-//     const skip = (page - 1) * perPage;
-//     try {
-//         const count = await Post.find({}).countDocuments();
-//         const posts = await Post.find({}).skip(skip).limit(perPage).sort({ updatedAt: -1 });
-//         return res.status(200).json({ response: posts, count, perPage });
-//     } catch (error) {
-//         console.log(error.message)
-//         return res.status(500).json({ errors: error, msg: error.message });
-//     }
-// }
-
 module.exports.homeTesting = async (req, res) => {
     try {
         const posts = await Post.find({});
 
         return res.status(200).json(posts)
     } catch (error) {
-        console.log(error.message);
         return res.status(500).json({ errors: error, msg: error.message });
     }
 }
@@ -176,7 +148,6 @@ module.exports.postDetail = async (req, res) => {
     const id = req.params.id;
     try {
         const post = await Post.findOne({ _id: id });
-        console.log(post);
         return res.status(200).json({ post });
     }
     catch (error) {
