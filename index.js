@@ -9,7 +9,12 @@ const profileRoutes = require("./routes/profileRoutes");
 const bodyParser = require("body-parser");
 var cors = require('cors')
 
-app.use(cors())
+const corsOptions = {
+    origin: "*",
+    method: ["GET", "POST"]
+}
+
+app.use(cors(corsOptions))
 
 connect();
 app.use(bodyParser.json());
